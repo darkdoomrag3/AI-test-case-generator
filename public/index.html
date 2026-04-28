@@ -21,10 +21,7 @@
         <div class="provider-bar" id="providerBar">
           <label>AI provider</label>
           <div class="provider-options">
-            <select id="providerSelect" aria-label="AI provider" style="display:none;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,0.35);color:#fff;border:1px solid rgba(255,255,255,0.2);">
-              <option value="openai">OpenAI</option>
-              <option value="gemini">Gemini</option>
-            </select>
+            <select id="providerSelect" aria-label="AI provider" style="display:none;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,0.35);color:#fff;border:1px solid rgba(255,255,255,0.2);"></select>
           </div>
           <span class="config-status" id="configStatus">Checking configuration…</span>
         </div>
@@ -98,7 +95,7 @@
         <div id="results">
           <div class="empty-state" id="emptyState">
             <div class="icon">🧪</div>
-            <p>Add requirements and run generate. Configure <code>.env</code> with <code>OPENAI_API_KEY</code> and/or <code>GEMINI_API_KEY</code>.</p>
+            <p>Add requirements and run generate. Configure <code>.env</code> with <code>OPENAI_API_KEY</code>, <code>GROQ_API_KEY</code>, and/or <code>GEMINI_API_KEY</code>.</p>
           </div>
 
           <div id="testCasesContent" style="display:none;">
