@@ -1,0 +1,18 @@
+{
+  "name": "ai-test-case-generator",
+  "version": "2.0.0",
+  "description": "QA-focused AI test case generator (OpenAI + Gemini)",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4.44.0"
+  }
+}
