@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QA Workbench — QA Copilot</title>
+  <script src="js/theme-init.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-wrap">
+  <script src="js/nav.js"></script>
+  <div class="container">
+    <div class="header">
+      <h1>QA Copilot</h1>
+      <p>Ask about strategy, coverage, bug quality, automation, a11y/security smoke, or anything your team would ask a senior QA lead</p>
+    </div>
+
+    <div class="panel provider-bar" id="providerBar">
+      <label>AI provider</label>
+      <select id="providerSelect" aria-label="AI provider" style="display:none;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,0.35);color:#fff;border:1px solid rgba(255,255,255,0.2);"></select>
+      <span class="config-status" id="configStatus">Checking…</span>
+    </div>
+
+    <div class="chat-layout">
+      <div class="panel">
+        <div class="chat-log" id="chatLog" aria-live="polite"></div>
+        <div class="form-group" style="margin-top:14px;">
+          <label for="userInput">Your message</label>
+          <textarea id="userInput" style="min-height:96px;" placeholder="e.g. We're shipping a payment retry change — what should regression focus on given two days?"></textarea>
+        </div>
+        <div class="export-buttons" style="margin-top:8px;">
+          <button type="button" class="btn btn-primary" id="btnSend" style="width:auto;">Send</button>
+          <button type="button" class="btn btn-export" id="btnClear">Clear chat</button>
+        </div>
+      </div>
+      <div class="panel chat-sidebar">
+        <h2>Tips</h2>
+        <p class="hint-text">Context-rich prompts get better answers. Mention platform, release timing, risk appetite, and what you already tested.</p>
+        <p class="hint-text">Copilot does not see your repo or Jira — paste snippets when it helps. For saved suites, use <a href="/history" style="color:#93c5fd;">Suite history</a>.</p>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="js/agent.js"></script>
+</body>
+</html>

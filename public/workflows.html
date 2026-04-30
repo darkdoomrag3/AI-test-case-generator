@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QA Workbench — Workflows</title>
+  <script src="js/theme-init.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-wrap">
+  <script src="js/nav.js"></script>
+  <div class="container">
+    <div class="header">
+      <h1>Structured QA workflows</h1>
+      <p>Turn rough notes into structured JSON for tickets, wikis, or handoffs — same AI providers as the rest of the app</p>
+    </div>
+
+    <div class="panel provider-bar" id="providerBar">
+      <label>AI provider</label>
+      <select id="providerSelect" aria-label="AI provider" style="display:none;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,0.35);color:#fff;border:1px solid rgba(255,255,255,0.2);"></select>
+      <span class="config-status" id="configStatus">Checking…</span>
+    </div>
+
+    <div class="panel">
+      <div class="workflow-section" id="wf-bug">
+        <h2>Bug report coach</h2>
+        <p class="hint-text">Sharpen title, repro, severity guess, and what is still missing.</p>
+        <div class="form-group"><label for="bugSummary">Summary</label><textarea id="bugSummary"></textarea></div>
+        <div class="form-group"><label for="bugSteps">Steps to reproduce</label><textarea id="bugSteps"></textarea></div>
+        <div class="form-group"><label for="bugExpected">Expected</label><textarea id="bugExpected"></textarea></div>
+        <div class="form-group"><label for="bugActual">Actual</label><textarea id="bugActual"></textarea></div>
+        <div class="form-group"><label for="bugEnv">Environment</label><textarea id="bugEnv" placeholder="OS, browser, build, tenant…"></textarea></div>
+        <button type="button" class="btn btn-primary" data-workflow="bug-report" style="width:auto;">Run</button>
+        <div class="workflow-result" id="out-bug" style="display:none;"><pre id="pre-bug"></pre></div>
+      </div>
+
+      <div class="workflow-section" id="wf-charter">
+        <h2>Exploratory charter</h2>
+        <p class="hint-text">Session mission, oracles, and ideas — not scripted steps.</p>
+        <div class="form-group"><label for="charterArea">Feature / area</label><input type="text" id="charterArea"></div>
+        <div class="form-group"><label for="charterMission">Mission</label><textarea id="charterMission"></textarea></div>
+        <div class="form-group"><label for="charterTimebox">Timebox</label><input type="text" id="charterTimebox" placeholder="e.g. 90 minutes"></div>
+        <div class="form-group"><label for="charterFocus">Focus / risks</label><textarea id="charterFocus"></textarea></div>
+        <button type="button" class="btn btn-primary" data-workflow="charter" style="width:auto;">Run</button>
+        <div class="workflow-result" id="out-charter" style="display:none;"><pre id="pre-charter"></pre></div>
+      </div>
+
+      <div class="workflow-section" id="wf-release">
+        <h2>Release checklist</h2>
+        <p class="hint-text">Pre-deploy, verification, and rollback signals stakeholders care about.</p>
+        <div class="form-group"><label for="relName">Release / version</label><input type="text" id="relName"></div>
+        <div class="form-group"><label for="relScope">Scope / changes</label><textarea id="relScope"></textarea></div>
+        <div class="form-group"><label for="relRisk">Known risks</label><textarea id="relRisk"></textarea></div>
+        <button type="button" class="btn btn-primary" data-workflow="release-checklist" style="width:auto;">Run</button>
+        <div class="workflow-result" id="out-release" style="display:none;"><pre id="pre-release"></pre></div>
+      </div>
+
+      <div class="workflow-section" id="wf-risk">
+        <h2>Risk review</h2>
+        <p class="hint-text">Brainstorm product and release risks with mitigations and test angles.</p>
+        <div class="form-group"><label for="riskContext">Context</label><textarea id="riskContext" style="min-height:160px;" placeholder="Paste requirements, change list, or team concerns…"></textarea></div>
+        <button type="button" class="btn btn-primary" data-workflow="risk-review" style="width:auto;">Run</button>
+        <div class="workflow-result" id="out-risk" style="display:none;"><pre id="pre-risk"></pre></div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="js/workflows.js"></script>
+</body>
+</html>

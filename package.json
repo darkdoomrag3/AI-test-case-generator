@@ -1,7 +1,7 @@
 {
   "name": "ai-test-case-generator",
   "version": "2.0.0",
-  "description": "QA-focused AI test case generator (OpenAI + Gemini)",
+  "description": "QA Workbench: suite generation, QA Copilot, workflows, exports",
   "type": "module",
   "main": "src/server.js",
   "scripts": {

@@ -30,6 +30,52 @@ function priorityBadgeClass(p) {
   return 'badge-medium';
 }
 
+function countEnabledProviders(providers) {
+  if (!providers) {
+    return 0;
+  }
+  let n = 0;
+  if (providers.openai) {
+    n++;
+  }
+  if (providers.groq) {
+    n++;
+  }
+  if (providers.gemini) {
+    n++;
+  }
+  return n;
+}
+
+function fillProviderSelect(providers, activeProvider) {
+  const sel = document.getElementById('providerSelect');
+  sel.innerHTML = '';
+  const entries = [];
+  if (providers.openai) {
+    entries.push(['openai', 'OpenAI']);
+  }
+  if (providers.groq) {
+    entries.push(['groq', 'Groq']);
+  }
+  if (providers.gemini) {
+    entries.push(['gemini', 'Gemini']);
+  }
+  entries.forEach(([val, label]) => {
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  });
+  const first = entries[0]?.[0];
+  const active = activeProvider && entries.some(([v]) => v === activeProvider)
+    ? activeProvider
+    : first;
+  if (active) {
+    sel.value = active;
+  }
+  sel.style.display = entries.length > 1 ? 'inline-block' : 'none';
+}
+
 async function loadConfig() {
   const status = document.getElementById('configStatus');
   const sel = document.getElementById('providerSelect');
@@ -37,20 +83,16 @@ async function loadConfig() {
     const response = await fetch('/api/config');
     appConfig = await response.json();
     if (!appConfig.ok) {
-      status.textContent = 'Configure OPENAI_API_KEY and/or GEMINI_API_KEY in .env';
+      status.textContent =
+        'Configure OPENAI_API_KEY, GROQ_API_KEY, and/or GEMINI_API_KEY in .env';
       status.className = 'config-status bad';
       sel.style.display = 'none';
+      sel.innerHTML = '';
       return;
     }
     status.textContent = `Ready — default: ${appConfig.activeProvider}`;
     status.className = 'config-status ok';
-    const { providers } = appConfig;
-    if (providers.openai && providers.gemini) {
-      sel.style.display = 'inline-block';
-      sel.value = appConfig.activeProvider || 'openai';
-    } else {
-      sel.style.display = 'none';
-    }
+    fillProviderSelect(appConfig.providers, appConfig.activeProvider);
   } catch {
     status.textContent = 'Could not reach /api/config';
     status.className = 'config-status bad';
@@ -118,12 +160,7 @@ document.getElementById('generateForm').addEventListener('submit', async (e) => 
     document.getElementById('requirementContext').value,
   );
 
-  if (
-    appConfig &&
-    appConfig.providers &&
-    appConfig.providers.openai &&
-    appConfig.providers.gemini
-  ) {
+  if (appConfig && countEnabledProviders(appConfig.providers) > 1) {
     formData.append('provider', document.getElementById('providerSelect').value);
   }
 

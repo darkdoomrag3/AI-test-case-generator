@@ -3,123 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QA Test Suite Generator</title>
+  <title>QA Workbench — Home</title>
+  <script src="js/theme-init.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="page-wrap">
+  <script src="js/nav.js"></script>
   <div class="container">
     <div class="header">
-      <h1>QA Test Suite Generator</h1>
-      <p>Requirements-to-tests with traceability, risk, and export for test management workflows</p>
+      <h1>QA Workbench</h1>
+      <p>AI-assisted planning, generation, and review for software QA teams — in one local app</p>
     </div>
 
-    <div class="main-grid">
-      <div class="panel">
-        <h2>Scope &amp; inputs</h2>
+    <div class="dashboard-grid">
+      <a class="dash-card" href="/generator">
+        <h3>Suite generator</h3>
+        <p>Turn requirements and mocks into traceable suites with exports (CSV, XML, JSON, Markdown).</p>
+        <span class="dash-cta">Open</span>
+      </a>
+      <a class="dash-card" href="/agent">
+        <h3>QA Copilot</h3>
+        <p>Chat with an agent for strategy, edge cases, bug triage wording, automation trade-offs, and more.</p>
+        <span class="dash-cta">Open</span>
+      </a>
+      <a class="dash-card" href="/workflows">
+        <h3>Structured workflows</h3>
+        <p>Bug report coach, exploratory charters, release checklists, and risk brainstorming — JSON you can paste into Jira or Confluence.</p>
+        <span class="dash-cta">Open</span>
+      </a>
+      <a class="dash-card" href="/history">
+        <h3>Suite history</h3>
+        <p>Browse past generations saved on disk under <code>data/history</code>.</p>
+        <span class="dash-cta">Open</span>
+      </a>
+    </div>
 
-        <div class="provider-bar" id="providerBar">
-          <label>AI provider</label>
-          <div class="provider-options">
-            <select id="providerSelect" aria-label="AI provider" style="display:none;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,0.35);color:#fff;border:1px solid rgba(255,255,255,0.2);">
-              <option value="openai">OpenAI</option>
-              <option value="gemini">Gemini</option>
-            </select>
-          </div>
-          <span class="config-status" id="configStatus">Checking configuration…</span>
-        </div>
-
-        <form id="generateForm">
-          <div class="form-group">
-            <label for="featureName">Feature / epic name</label>
-            <input type="text" id="featureName" placeholder="e.g. Checkout — saved addresses">
-          </div>
-
-          <div class="form-group">
-            <label for="platform">Platform</label>
-            <select id="platform">
-              <option value="Web">Web application</option>
-              <option value="Mobile">Mobile app</option>
-              <option value="API">API / backend</option>
-              <option value="Desktop">Desktop</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="depth">Coverage depth</label>
-            <select id="depth">
-              <option value="Smoke">Smoke (few high-value paths)</option>
-              <option value="Comprehensive" selected>Comprehensive</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="checkbox-row">
-              <input type="checkbox" id="includeNonFunctional">
-              <span>Include non-functional angles (security, a11y, performance) when relevant</span>
-            </label>
-          </div>
-
-          <div class="form-group">
-            <label for="requirementContext">Requirement IDs (optional, for traceability)</label>
-            <textarea id="requirementContext" style="min-height:100px;" placeholder="Paste REQ-12, BRD-4, JIRA keys, or bullet list — mapped to requirementRefs in output"></textarea>
-            <p class="hint-text">Helps testers link cases back to backlog artefacts.</p>
-          </div>
-
-          <div class="form-group">
-            <label for="requirements">Requirements / acceptance criteria *</label>
-            <textarea id="requirements" placeholder="Describe behaviour, constraints, edge cases, error expectations, analytics events, etc."></textarea>
-          </div>
-
-          <div class="form-group">
-            <label>Screenshots / mocks</label>
-            <div class="file-upload" id="dropZone">
-              <input type="file" id="screenshots" multiple accept="image/*">
-              <div class="icon">📸</div>
-              <p>Drag &amp; drop or click (PNG/JPG/WebP, max 10MB each)</p>
-            </div>
-            <div class="preview-images" id="previewImages"></div>
-          </div>
-
-          <button type="submit" class="btn btn-primary" id="generateBtn">
-            <span>🚀</span> Generate suite
-          </button>
-        </form>
-      </div>
-
-      <div class="panel">
-        <h2>Generated suite</h2>
-
-        <div class="loading" id="loading">
-          <div class="spinner"></div>
-          <p>Generating structured tests and suite metadata…</p>
-        </div>
-
-        <div id="results">
-          <div class="empty-state" id="emptyState">
-            <div class="icon">🧪</div>
-            <p>Add requirements and run generate. Configure <code>.env</code> with <code>OPENAI_API_KEY</code> and/or <code>GEMINI_API_KEY</code>.</p>
-          </div>
-
-          <div id="testCasesContent" style="display:none;">
-            <div id="suiteSummary" class="suite-summary" style="display:none;"></div>
-            <div class="stats" id="stats"></div>
-
-            <div class="export-buttons">
-              <button type="button" class="btn btn-export" id="btnCsv">📄 CSV</button>
-              <button type="button" class="btn btn-export" id="btnXml">📄 XML</button>
-              <button type="button" class="btn btn-export" id="btnJson">📄 JSON</button>
-              <button type="button" class="btn btn-export" id="btnMd">📄 Markdown</button>
-            </div>
-
-            <div class="test-cases-list" id="testCasesList"></div>
-          </div>
-        </div>
-      </div>
+    <div class="panel dashboard-footnote">
+      <p class="hint-text">Configure at least one of <code>OPENAI_API_KEY</code>, <code>GROQ_API_KEY</code>, or <code>GEMINI_API_KEY</code> in <code>.env</code>. The Copilot and workflows use the same provider selection rules as the generator.</p>
     </div>
   </div>
-
-  <div class="toast" id="toast"></div>
-  <script src="js/app.js"></script>
 </body>
 </html>
