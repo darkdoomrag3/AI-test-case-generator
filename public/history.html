@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QA Workbench — Suite history</title>
+  <script src="js/theme-init.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-wrap">
+  <script src="js/nav.js"></script>
+  <div class="container">
+    <div class="header">
+      <h1>Suite history</h1>
+      <p>Local JSON exports from successful generator runs in <code>data/history</code></p>
+    </div>
+
+    <div class="panel">
+      <button type="button" class="btn btn-export" id="btnRefresh">Refresh list</button>
+      <div class="history-table-wrap">
+        <table class="history-table" id="histTable" aria-label="Saved suites">
+          <thead>
+            <tr>
+              <th>Updated</th>
+              <th>Feature</th>
+              <th>Cases</th>
+              <th>Provider</th>
+              <th>Open</th>
+            </tr>
+          </thead>
+          <tbody id="histBody"></tbody>
+        </table>
+      </div>
+      <div class="history-detail panel" id="histDetail" style="display:none;margin-top:16px;background:rgba(0,0,0,0.35);">
+        <h2 id="histDetailTitle">Detail</h2>
+        <pre id="histDetailPre" style="max-height:480px;overflow:auto;font-size:0.82em;color:#d1d5db;"></pre>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="js/history.js"></script>
+</body>
+</html>

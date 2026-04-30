@@ -1,15 +1,16 @@
-# AI Test Case Generator
+# QA Workbench
 
-A web app that turns product requirements (and optional screenshots) into structured test artefacts for QA: suites with traceability metadata, detailed cases, and exports for tools and documentation.
+A local web app for software QA teams: structured **test suite generation**, a conversational **QA Copilot** agent, **guided workflows** (bug reports, exploratory charters, release checklists, risk reviews), **exports** for test management tools, and a **history browser** for past suites.
 
-One Node.js server supports **OpenAI** (official API), **Groq** (OpenAI-compatible API at `api.groq.com`), and **Google Gemini**. Configure whichever provider you use; if more than one API key is present, you can choose the provider in the UI or lock it via environment variables.
+One Node.js server supports **OpenAI** (official API), **Groq** (`api.groq.com`), and **Google Gemini**. Configure whichever provider you use; if more than one API key is present, pick a backend per screen or lock defaults in `.env`.
 
 ## Features
 
-- **Multiple AI backends**: OpenAI (`gpt-4o` by default), Groq (Llama vision/text defaults; see `.env.example`), or Gemini (`gemini-2.0-flash` by default); optional screenshot analysis where the model supports it.
-- **QA-oriented output**: Suite summary, assumptions, open questions, risks; per-case fields such as requirement references, priority, severity, type, category, risk, test data, automation hints, pre/postconditions.
-- **Exports**: CSV (wide column set), XML, JSON (suite + cases), Markdown (suites for wikis or Confluence-style docs).
-- **Local history**: Successful generations saved under `data/history/` as JSON.
+- **Suite generator** (`/generator`): requirements and optional screenshots → suites with traceability metadata; exports CSV, XML, JSON, Markdown.
+- **QA Copilot** (`/agent`): multi-turn chat for strategy, coverage, bug quality, automation trade-offs, and similar QA questions. System prompt is fixed server-side.
+- **Workflows** (`/workflows`): structured JSON outputs for bug report coaching, exploratory charters, release checklists, and risk brainstorming (paste into Jira, Confluence, etc.).
+- **Suite history** (`/history`): browse `data/history` JSON from successful generator runs.
+- **Multiple AI backends**: OpenAI, Groq, Gemini with shared provider selection rules.
 
 ## Requirements
 
@@ -19,13 +20,13 @@ One Node.js server supports **OpenAI** (official API), **Groq** (OpenAI-compatib
 ## Project layout
 
 ```
-├── public/              # Static UI (HTML, CSS, JS)
+├── public/              # Multi-page UI (dashboard, generator, agent, workflows, history)
 ├── src/
 │   ├── config/          # Environment and provider resolution
-│   ├── providers/       # OpenAI, Groq, Gemini generation
-│   ├── prompts/         # Shared generation prompts
-│   ├── routes/          # REST API and export helpers
-│   ├── services/        # Generation orchestration
+│   ├── providers/       # OpenAI, Groq, Gemini + agent chat
+│   ├── prompts/         # Suite, agent, and workflow prompts
+│   ├── routes/          # REST API, exports, QA platform routes
+│   ├── services/        # Generation + workflow JSON orchestration
 │   ├── http/            # Upload handling (Multer)
 │   ├── utils/           # Paths, history, JSON parsing
 │   └── server.js        # Express entrypoint
@@ -74,6 +75,10 @@ Edit `.env`:
 
 Environment files are loaded from the **project root** `.env` first, then `src/.env` if present (legacy compatibility).
 
+## Theme
+
+Use **Auto**, **Dark**, or **Light** in the top navigation. **Auto** follows the OS (`prefers-color-scheme`). The choice is stored in `localStorage` under `qa-workbench-theme` (`system` | `dark` | `light`). A small script in each page head applies the theme before paint to limit flashing.
+
 ## Running
 
 ```bash
@@ -82,7 +87,15 @@ npm start
 
 Open **http://localhost:3847** (or your configured `PORT`).
 
-The UI shows connection status under **AI provider**. If more than one backend is configured, a dropdown selects which runs for each generation.
+| Path | Screen |
+|------|--------|
+| `/` | Dashboard |
+| `/generator` | Test suite generator |
+| `/agent` | QA Copilot (chat) |
+| `/workflows` | Structured workflows |
+| `/history` | Saved suite library |
+
+If more than one backend is configured, pages that call the model show a provider dropdown.
 
 ## API (summary)
 
@@ -95,6 +108,15 @@ The UI shows connection status under **AI provider**. If more than one backend i
 | `POST` | `/api/export/xml` | Same shape. |
 | `POST` | `/api/export/json` | Body: `{ "suite": {}, "testCases": [...] }`. |
 | `POST` | `/api/export/md` | Same as JSON export body. |
+| `POST` | `/api/agent/chat` | Body: `{ "messages": [{"role":"user"|"assistant","content":"..."}], "provider"?: "openai"|"groq"|"gemini" }`. |
+| `POST` | `/api/workflows/bug-report` | Body: `summary`, `stepsToReproduce`, `expected`, `actual`, `environment`, optional `provider`. |
+| `POST` | `/api/workflows/charter` | Body: `featureArea`, `mission`, `timebox`, `focus`, optional `provider`. |
+| `POST` | `/api/workflows/release-checklist` | Body: `releaseName`, `scopeNotes`, `riskNotes`, optional `provider`. |
+| `POST` | `/api/workflows/risk-review` | Body: `context`, optional `provider`. |
+| `GET` | `/api/history` | List saved suite files with metadata. |
+| `GET` | `/api/history/file/:name` | One saved JSON record (safe filename only). |
+
+Optional model overrides for Copilot / workflows: `AGENT_OPENAI_MODEL`, `GROQ_AGENT_MODEL`, `AGENT_GEMINI_MODEL`, `WORKFLOW_OPENAI_MODEL`, `WORKFLOW_GROQ_MODEL`, `WORKFLOW_GEMINI_MODEL` (see code defaults if unset).
 
 ## Data and privacy
 
