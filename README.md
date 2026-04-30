@@ -133,4 +133,6 @@ Optional model overrides for Copilot / workflows: `AGENT_OPENAI_MODEL`, `GROQ_AG
 
 ## License
 
-Use and modify according to your organization’s policies; add a SPDX license file if you publish this repository publicly.
+Open source under the [MIT License](LICENSE). You may use, copy, modify, and distribute the software; include the license notice in copies. See `LICENSE` for the full text.
+
+Replace “ai-test-case-generator contributors” in `LICENSE` with your name or organization in the copyright line if you prefer.
