@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QA Workbench — Suite generator</title>
+  <title>QA Workbench - Suite generator</title>
   <script src="js/theme-init.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -105,11 +105,38 @@
             <div class="stats" id="stats"></div>
 
             <div class="export-buttons">
-              <button type="button" class="btn btn-export" id="btnCsv">📄 CSV</button>
-              <button type="button" class="btn btn-export" id="btnXml">📄 XML</button>
-              <button type="button" class="btn btn-export" id="btnJson">📄 JSON</button>
-              <button type="button" class="btn btn-export" id="btnMd">📄 Markdown</button>
+              <button type="button" class="btn btn-export" id="btnCsv">CSV</button>
+              <button type="button" class="btn btn-export" id="btnXml">XML</button>
+              <button type="button" class="btn btn-export" id="btnJson">JSON</button>
+              <button type="button" class="btn btn-export" id="btnMd">Markdown</button>
             </div>
+
+            <div class="review-toolbar" aria-label="Generated suite filters">
+              <div class="review-search">
+                <label for="caseSearch">Search cases</label>
+                <input type="search" id="caseSearch" placeholder="ID, title, tag, requirement, step...">
+              </div>
+              <div>
+                <label for="priorityFilter">Priority</label>
+                <select id="priorityFilter">
+                  <option value="">All</option>
+                </select>
+              </div>
+              <div>
+                <label for="typeFilter">Type</label>
+                <select id="typeFilter">
+                  <option value="">All</option>
+                </select>
+              </div>
+              <div>
+                <label for="riskFilter">Risk</label>
+                <select id="riskFilter">
+                  <option value="">All</option>
+                </select>
+              </div>
+              <button type="button" class="btn btn-export" id="btnClearFilters">Clear</button>
+            </div>
+            <p class="hint-text" id="filterSummary"></p>
 
             <div class="test-cases-list" id="testCasesList"></div>
           </div>

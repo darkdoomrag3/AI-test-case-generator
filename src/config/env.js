@@ -9,7 +9,7 @@ dotenv.config({ path: path.join(rootDir, '.env') });
 dotenv.config({ path: path.join(rootDir, 'src', '.env') });
 dotenv.config();
 
-export const PORT = Number(process.env.PORT) || 3849;
+export const PORT = Number(process.env.PORT) || 3847;
 
 /** Official OpenAI API (Chat Completions + vision). */
 export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
