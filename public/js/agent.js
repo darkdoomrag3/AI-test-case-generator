@@ -74,7 +74,7 @@ async function loadConfig() {
       sel.innerHTML = '';
       return;
     }
-    status.textContent = `Ready — default: ${appConfig.activeProvider}`;
+    status.textContent = `Ready - default: ${appConfig.activeProvider}`;
     status.className = 'config-status ok';
     fillProviderSelect(appConfig.providers, appConfig.activeProvider);
   } catch {

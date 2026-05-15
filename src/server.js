@@ -37,7 +37,7 @@ app.get('/history', (_req, res) => {
 app.use('/api', createApiRouter(upload));
 
 const server = app.listen(PORT, () => {
-  console.log(`\nQA Workbench — http://localhost:${PORT}\n`);
+  console.log(`\nQA Workbench - http://localhost:${PORT}\n`);
 });
 
 server.on('error', (err) => {

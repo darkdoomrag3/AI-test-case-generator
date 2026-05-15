@@ -4,6 +4,7 @@ let generatedTestCases = [];
 let generatedSuite = {};
 let lastProvider = '';
 let appConfig = null;
+const FILTER_FIELDS = ['priority', 'type', 'risk'];
 
 function escapeHtml(s) {
   if (s == null) {
@@ -28,6 +29,88 @@ function priorityBadgeClass(p) {
     return 'badge-low';
   }
   return 'badge-medium';
+}
+
+function getCurrentFilters() {
+  return {
+    search: document.getElementById('caseSearch')?.value.trim().toLowerCase() || '',
+    priority: document.getElementById('priorityFilter')?.value || '',
+    type: document.getElementById('typeFilter')?.value || '',
+    risk: document.getElementById('riskFilter')?.value || '',
+  };
+}
+
+function testCaseSearchText(tc) {
+  const steps = Array.isArray(tc.steps)
+    ? tc.steps.flatMap((s) => [s.action, s.expected])
+    : [];
+  return [
+    tc.id,
+    tc.title,
+    tc.priority,
+    tc.severity,
+    tc.type,
+    tc.category,
+    tc.risk,
+    tc.preconditions,
+    tc.testData,
+    tc.expectedResult,
+    tc.postconditions,
+    tc.automation?.notes,
+    ...(Array.isArray(tc.requirementRefs) ? tc.requirementRefs : []),
+    ...(Array.isArray(tc.tags) ? tc.tags : []),
+    ...steps,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+function matchesFilters(tc, filters) {
+  if (filters.priority && tc.priority !== filters.priority) {
+    return false;
+  }
+  if (filters.type && tc.type !== filters.type) {
+    return false;
+  }
+  if (filters.risk && tc.risk !== filters.risk) {
+    return false;
+  }
+  return !filters.search || testCaseSearchText(tc).includes(filters.search);
+}
+
+function getFilteredTestCases() {
+  const filters = getCurrentFilters();
+  return generatedTestCases.filter((tc) => matchesFilters(tc, filters));
+}
+
+function uniqueSortedValues(field) {
+  return [...new Set(generatedTestCases.map((tc) => tc[field]).filter(Boolean))]
+    .sort((a, b) => String(a).localeCompare(String(b)));
+}
+
+function fillFilterSelect(id, values) {
+  const select = document.getElementById(id);
+  if (!select) {
+    return;
+  }
+  const current = select.value;
+  select.innerHTML = '<option value="">All</option>';
+  values.forEach((value) => {
+    const opt = document.createElement('option');
+    opt.value = value;
+    opt.textContent = value;
+    select.appendChild(opt);
+  });
+  if (values.includes(current)) {
+    select.value = current;
+  }
+}
+
+function refreshFilterOptions() {
+  fillFilterSelect('priorityFilter', uniqueSortedValues('priority'));
+  fillFilterSelect('typeFilter', uniqueSortedValues('type'));
+  fillFilterSelect('riskFilter', uniqueSortedValues('risk'));
 }
 
 function countEnabledProviders(providers) {
@@ -90,7 +173,7 @@ async function loadConfig() {
       sel.innerHTML = '';
       return;
     }
-    status.textContent = `Ready — default: ${appConfig.activeProvider}`;
+    status.textContent = `Ready - default: ${appConfig.activeProvider}`;
     status.className = 'config-status ok';
     fillProviderSelect(appConfig.providers, appConfig.activeProvider);
   } catch {
@@ -185,6 +268,7 @@ document.getElementById('generateForm').addEventListener('submit', async (e) => 
     generatedTestCases = Array.isArray(data.testCases) ? data.testCases : [];
     generatedSuite = data.suite && typeof data.suite === 'object' ? data.suite : {};
     lastProvider = data.provider || '';
+    refreshFilterOptions();
     renderSuiteSummary();
     renderTestCases();
     showToast(
@@ -253,13 +337,15 @@ function renderTestCases() {
 
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('testCasesContent').style.display = 'block';
+  const visibleTestCases = getFilteredTestCases();
 
   const stats = {
-    total: generatedTestCases.length,
-    critical: generatedTestCases.filter((tc) => tc.priority === 'Critical').length,
-    high: generatedTestCases.filter((tc) => tc.priority === 'High').length,
-    medium: generatedTestCases.filter((tc) => tc.priority === 'Medium').length,
-    low: generatedTestCases.filter((tc) => tc.priority === 'Low').length,
+    total: visibleTestCases.length,
+    critical: visibleTestCases.filter((tc) => tc.priority === 'Critical').length,
+    high: visibleTestCases.filter((tc) => tc.priority === 'High').length,
+    medium: visibleTestCases.filter((tc) => tc.priority === 'Medium').length,
+    low: visibleTestCases.filter((tc) => tc.priority === 'Low').length,
+    automation: visibleTestCases.filter((tc) => tc.automation?.candidate === true).length,
   };
 
   document.getElementById('stats').innerHTML = `
@@ -283,10 +369,25 @@ function renderTestCases() {
       <div class="stat-number" style="color:#10b981;">${stats.low}</div>
       <div class="stat-label">Low</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-number" style="color:#38bdf8;">${stats.automation}</div>
+      <div class="stat-label">Automatable</div>
+    </div>
   `;
 
+  const filterSummary = document.getElementById('filterSummary');
+  filterSummary.textContent =
+    visibleTestCases.length === generatedTestCases.length
+      ? `${generatedTestCases.length} generated cases`
+      : `${visibleTestCases.length} of ${generatedTestCases.length} cases match the current filters`;
+
   const list = document.getElementById('testCasesList');
-  list.innerHTML = generatedTestCases
+  if (!visibleTestCases.length) {
+    list.innerHTML = '<div class="empty-state"><p>No test cases match the current filters.</p></div>';
+    return;
+  }
+
+  list.innerHTML = visibleTestCases
     .map((tc) => {
       const steps = Array.isArray(tc.steps) ? tc.steps : [];
       const refs =
@@ -308,7 +409,7 @@ function renderTestCases() {
         : '';
       const auto =
         tc.automation && typeof tc.automation === 'object'
-          ? `<div class="test-case-section"><h4>Automation</h4><p>${escapeHtml(tc.automation.candidate === true ? 'Candidate — ' : tc.automation.candidate === false ? 'Not a candidate — ' : '')}${escapeHtml(tc.automation.notes || '')}</p></div>`
+          ? `<div class="test-case-section"><h4>Automation</h4><p>${escapeHtml(tc.automation.candidate === true ? 'Candidate - ' : tc.automation.candidate === false ? 'Not a candidate - ' : '')}${escapeHtml(tc.automation.notes || '')}</p></div>`
           : '';
       const testData = tc.testData
         ? `<div class="test-case-section"><h4>Test data</h4><p>${escapeHtml(tc.testData)}</p></div>`
@@ -342,7 +443,7 @@ function renderTestCases() {
                 <li>
                   <div class="step-content">
                     <span class="step-action">${escapeHtml(step.action)}</span>
-                    <span class="step-expected">✓ ${escapeHtml(step.expected)}</span>
+                    <span class="step-expected">Pass: ${escapeHtml(step.expected)}</span>
                   </div>
                 </li>`,
                 )
@@ -408,6 +509,19 @@ document.getElementById('btnMd').addEventListener('click', () => {
     suite: generatedSuite,
     testCases: generatedTestCases,
   });
+});
+
+document.getElementById('btnClearFilters').addEventListener('click', () => {
+  document.getElementById('caseSearch').value = '';
+  FILTER_FIELDS.forEach((field) => {
+    document.getElementById(`${field}Filter`).value = '';
+  });
+  renderTestCases();
+});
+
+document.getElementById('caseSearch').addEventListener('input', renderTestCases);
+FILTER_FIELDS.forEach((field) => {
+  document.getElementById(`${field}Filter`).addEventListener('change', renderTestCases);
 });
 
 function downloadBlob(blob, filename) {
