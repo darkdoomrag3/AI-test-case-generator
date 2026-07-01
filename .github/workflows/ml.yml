@@ -1,0 +1,51 @@
+# CI for the Python ML service (ml/).
+# Runs only when files under ml/ change, so Node-only edits don't trigger it.
+name: ml-service
+
+on:
+  push:
+    paths:
+      - "ml/**"
+      - ".github/workflows/ml.yml"
+  pull_request:
+    paths:
+      - "ml/**"
+      - ".github/workflows/ml.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ml      # every step runs inside ml/
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Train model
+        run: python -m training.train
+
+      - name: Test (pytest)
+        run: pytest
+
+  docker:
+    needs: test                    # only build the image if tests passed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t qa-workbench-ml ./ml
+      # To publish: add docker/login-action + docker push, or a deploy step here.

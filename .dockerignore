@@ -1,0 +1,14 @@
+# Keep the Node image slim and builds reproducible.
+node_modules
+npm-debug.log*
+
+# The ML service has its own image (ml/Dockerfile) — don't copy it into this one.
+ml
+
+# Local data, secrets, VCS, docs.
+data
+.env
+.git
+.gitignore
+*.md
+test

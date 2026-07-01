@@ -1,0 +1,35 @@
+# Local orchestration for QA Workbench.
+#
+# Two SEPARATE images (built and deployable independently) run together on one
+# network so the Node app can reach the ML service by its service name.
+#
+#   app  (Node.js)  ->  http://ml:8000   (ML service, via the shared network)
+#
+# Usage:
+#   docker compose up --build      # build + start both
+#   docker compose up -d           # start in the background
+#   docker compose logs -f app     # follow one service's logs
+#   docker compose down            # stop and remove both
+
+services:
+  app:
+    build: .                       # root Dockerfile (Node app)
+    ports:
+      - "3847:3847"
+    env_file:
+      - .env                       # OPENAI_API_KEY, GROQ_API_KEY, etc.
+    environment:
+      # Reach the ML service by its compose service name on the shared network.
+      - ML_SERVICE_URL=http://ml:8000
+    depends_on:
+      - ml
+    volumes:
+      # Persist generated history across restarts (optional).
+      - ./data:/app/data
+    restart: unless-stopped
+
+  ml:
+    build: ./ml                    # ml/Dockerfile (Python FastAPI service)
+    ports:
+      - "8000:8000"                # exposed for direct testing at /docs
+    restart: unless-stopped
