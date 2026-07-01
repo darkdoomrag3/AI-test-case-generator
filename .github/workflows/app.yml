@@ -1,0 +1,40 @@
+# CI for the Node.js app (repo root).
+# Ignores ml/ changes so the Python service has its own pipeline (ml.yml).
+name: node-app
+
+on:
+  push:
+    paths-ignore:
+      - "ml/**"
+  pull_request:
+    paths-ignore:
+      - "ml/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["18", "20"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test (node --test)
+        run: npm test
+
+  docker:
+    needs: test                    # only build the image if tests passed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t qa-workbench-app .
+      # To publish: add docker/login-action + docker push, or a deploy step here.
